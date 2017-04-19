@@ -55,6 +55,14 @@ type Daytimer struct {
 	gcal   *calendar.Service // Google Calendar Service RPCs
 }
 
+// Agenda returns a listing of the events for a specific day
+func (dt Daytimer) Agenda(date time.Time) (*Agenda, error) {
+	var err error
+	agenda := new(Agenda)
+	agenda.events, err = dt.Upcoming(10)
+	return agenda, err
+}
+
 // Upcoming returns the n next events on the calendar.
 func (dt Daytimer) Upcoming(n int64) ([]string, error) {
 	var upcoming []string

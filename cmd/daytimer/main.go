@@ -4,7 +4,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/bbengfort/daytimer"
@@ -21,6 +20,22 @@ func main() {
 
 	// Define commands available to the application
 	app.Commands = []cli.Command{
+		{
+			Name:   "auth",
+			Usage:  "reauthenticate daytimer with Google",
+			Action: auth,
+		},
+		{
+			Name:   "agenda",
+			Usage:  "print out the agenda for a specific day",
+			Action: agenda,
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "d, date",
+					Usage: "specify the date as YYYY/MM/DD (default today)",
+				},
+			},
+		},
 		{
 			Name:   "upcoming",
 			Usage:  "view the upcoming events on your calendar",
@@ -39,15 +54,47 @@ func main() {
 	app.Run(os.Args)
 }
 
-func upcoming(c *cli.Context) error {
-	daytimer, err := daytimer.New()
-	if err != nil {
-		log.Fatal(err.Error())
+// Forces a reauthentication with Google
+func auth(c *cli.Context) error {
+	auth := new(daytimer.Authentication)
+	if err := auth.Authenticate(); err != nil {
+		return cli.NewExitError(err.Error(), 1)
 	}
 
-	events, err := daytimer.Upcoming(c.Int64("number"))
+	return nil
+}
+
+// Computes the agenda for a given date
+func agenda(c *cli.Context) error {
+	dt, err := daytimer.New()
 	if err != nil {
-		log.Fatal(err.Error())
+		return cli.NewExitError(err.Error(), 1)
+	}
+
+	date, err := daytimer.ParseDate(c.String("date"))
+	if err != nil {
+		return cli.NewExitError(err.Error(), 1)
+	}
+
+	agenda, err := dt.Agenda(date)
+	if err != nil {
+		return cli.NewExitError(err.Error(), 1)
+	}
+
+	fmt.Println(agenda.String())
+	return nil
+}
+
+// Lists the n upcoming events
+func upcoming(c *cli.Context) error {
+	dt, err := daytimer.New()
+	if err != nil {
+		return cli.NewExitError(err.Error(), 1)
+	}
+
+	events, err := dt.Upcoming(c.Int64("number"))
+	if err != nil {
+		return cli.NewExitError(err.Error(), 1)
 	}
 
 	if len(events) > 0 {
