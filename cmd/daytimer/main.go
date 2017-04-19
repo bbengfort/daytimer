@@ -45,7 +45,7 @@ func upcoming(c *cli.Context) error {
 		log.Fatal(err.Error())
 	}
 
-	events, err := daytimer.Upcoming(10)
+	events, err := daytimer.Upcoming(c.Int64("number"))
 	if err != nil {
 		log.Fatal(err.Error())
 	}
