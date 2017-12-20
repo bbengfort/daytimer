@@ -49,6 +49,11 @@ func main() {
 					Usage: "number of events to view",
 					Value: 10,
 				},
+				cli.StringFlag{
+					Name:  "c, calendar",
+					Usage: "id of calendar to list events for",
+					Value: "",
+				},
 			},
 		},
 		{
@@ -108,7 +113,7 @@ func agenda(c *cli.Context) error {
 		return cli.NewExitError(err.Error(), 1)
 	}
 
-	agenda, err := dt.Agenda(date)
+	agenda, err := dt.Agenda(date, nil)
 	if err != nil {
 		return cli.NewExitError(err.Error(), 1)
 	}
@@ -119,7 +124,8 @@ func agenda(c *cli.Context) error {
 
 // Lists the n upcoming events
 func upcoming(c *cli.Context) error {
-	events, err := dt.Upcoming(c.Int64("number"))
+
+	events, err := dt.Upcoming(c.Int64("number"), c.String("calendar"))
 	if err != nil {
 		return cli.NewExitError(err.Error(), 1)
 	}
@@ -127,7 +133,7 @@ func upcoming(c *cli.Context) error {
 	if len(events) > 0 {
 		fmt.Println("Upcoming events:")
 		for _, event := range events {
-			fmt.Println(event)
+			fmt.Println(event.String("2006-01-02 15:04"))
 		}
 	} else {
 		fmt.Println("No upcoming events found.")

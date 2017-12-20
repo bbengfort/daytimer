@@ -1,6 +1,6 @@
 # Daytimer
 
-**Console program for interaction with the Google Calendar API**
+**Console program for interaction with the [Google Calendar API](https://developers.google.com/google-apps/calendar/v3/reference/)**
 
 ## Getting Started
 

@@ -26,6 +26,16 @@ type Calendar struct {
 // Calendars Methods
 //===========================================================================
 
+// Primary returns the calendar listed as primary or nil
+func (c Calendars) Primary() *Calendar {
+	for _, cal := range c {
+		if cal.item.Primary {
+			return cal
+		}
+	}
+	return nil
+}
+
 // Active filters out all calendars that are not active, returning a new
 // Calendars map collection with the active items.
 func (c Calendars) Active() Calendars {
