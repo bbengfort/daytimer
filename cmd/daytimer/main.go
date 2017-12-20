@@ -5,6 +5,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/bbengfort/daytimer"
 	"github.com/urfave/cli"
@@ -29,6 +30,7 @@ func main() {
 			Name:   "agenda",
 			Usage:  "print out the agenda for a specific day",
 			Action: agenda,
+			Before: initDaytimer,
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "d, date",
@@ -40,6 +42,7 @@ func main() {
 			Name:   "upcoming",
 			Usage:  "view the upcoming events on your calendar",
 			Action: upcoming,
+			Before: initDaytimer,
 			Flags: []cli.Flag{
 				cli.Int64Flag{
 					Name:  "n, number",
@@ -48,11 +51,45 @@ func main() {
 				},
 			},
 		},
+		{
+			Name:   "calendars",
+			Usage:  "manage the calendars used to display activity",
+			Action: calendars,
+			Before: initDaytimer,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "l, list",
+					Usage: "list all available calendars from Google",
+				},
+				cli.StringFlag{
+					Name:  "a, activate",
+					Usage: "activate specfied calendars (comma sep)",
+				},
+			},
+		},
 	}
 
 	// Run the application
 	app.Run(os.Args)
 }
+
+//===========================================================================
+// Helper Functions
+//===========================================================================
+
+var dt *daytimer.Daytimer
+
+func initDaytimer(c *cli.Context) (err error) {
+	dt, err = daytimer.New()
+	if err != nil {
+		return cli.NewExitError(err.Error(), 1)
+	}
+	return nil
+}
+
+//===========================================================================
+// Commands
+//===========================================================================
 
 // Forces a reauthentication with Google
 func auth(c *cli.Context) error {
@@ -66,11 +103,6 @@ func auth(c *cli.Context) error {
 
 // Computes the agenda for a given date
 func agenda(c *cli.Context) error {
-	dt, err := daytimer.New()
-	if err != nil {
-		return cli.NewExitError(err.Error(), 1)
-	}
-
 	date, err := daytimer.ParseDate(c.String("date"))
 	if err != nil {
 		return cli.NewExitError(err.Error(), 1)
@@ -87,11 +119,6 @@ func agenda(c *cli.Context) error {
 
 // Lists the n upcoming events
 func upcoming(c *cli.Context) error {
-	dt, err := daytimer.New()
-	if err != nil {
-		return cli.NewExitError(err.Error(), 1)
-	}
-
 	events, err := dt.Upcoming(c.Int64("number"))
 	if err != nil {
 		return cli.NewExitError(err.Error(), 1)
@@ -106,5 +133,33 @@ func upcoming(c *cli.Context) error {
 		fmt.Println("No upcoming events found.")
 	}
 
+	return nil
+}
+
+// Manages the active calendars set by the user
+func calendars(c *cli.Context) error {
+	cals, err := dt.Calendars()
+	if err != nil {
+		return cli.NewExitError(err.Error(), 1)
+	}
+
+	// List all availabe calendars and return
+	if c.Bool("list") {
+		fmt.Println(cals.String())
+		return nil
+	}
+
+	// Set calendars as active in config
+	if activate := c.String("activate"); activate != "" {
+		for _, cid := range strings.Split(activate, ",") {
+			cid = strings.TrimSpace(cid)
+			if err := cals.Activate(cid); err != nil {
+				return cli.NewExitError(err.Error(), 1)
+			}
+		}
+	}
+
+	// Filter active calendars and print
+	fmt.Println(cals.Active().String())
 	return nil
 }

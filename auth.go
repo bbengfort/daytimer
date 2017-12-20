@@ -7,7 +7,6 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
-	"os/user"
 	"path/filepath"
 	"runtime"
 
@@ -121,15 +120,10 @@ func (auth *Authentication) Config() (*oauth2.Config, error) {
 // directory if necessary and stores it in the authentication struct.
 func (auth *Authentication) CachePath() (string, error) {
 	if auth.cachePath == "" {
-		// Get the user to look up the user's home directory
-		usr, err := user.Current()
+		cacheDir, err := configDirectory()
 		if err != nil {
 			return "", err
 		}
-
-		// Get the hidden credentials directory, making sure it's created
-		cacheDir := filepath.Join(usr.HomeDir, ".daytimer")
-		os.MkdirAll(cacheDir, 0700)
 
 		// Determine the path to the token cache file
 		cacheFile := url.QueryEscape("credentials.json")
@@ -139,19 +133,16 @@ func (auth *Authentication) CachePath() (string, error) {
 	return auth.cachePath, nil
 }
 
-// ConfigPath computes the path to the configuration file, client_secret.json.
+// ConfigPath computes the path to the configuration file: client_secret.json
 func (auth *Authentication) ConfigPath() (string, error) {
 	if auth.configPath == "" {
-		// Get the user to look up the user's home directory
-		usr, err := user.Current()
+		confDir, err := configDirectory()
 		if err != nil {
 			return "", err
 		}
 
 		// Create the path to the default configuration
-		auth.configPath = filepath.Join(
-			usr.HomeDir, ".daytimer", "client_secret.json",
-		)
+		auth.configPath = filepath.Join(confDir, "client_secret.json")
 	}
 
 	return auth.configPath, nil
