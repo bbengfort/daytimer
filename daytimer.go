@@ -72,8 +72,8 @@ func (dt *Daytimer) Agenda(date time.Time, calendars []string) (*Agenda, error) 
 
 	// Create a new agenda to start adding calendar items to
 	agenda := new(Agenda)
-	agenda.title = fmt.Sprintf("Daily Agenda for %s", date.Format("Monday, January 2, 2006"))
-	agenda.items = make([]*AgendaItem, 0)
+	agenda.Title = fmt.Sprintf("Daily Agenda for %s", date.Format("Monday, January 2, 2006"))
+	agenda.Items = make([]*AgendaItem, 0)
 
 	// For each calendar, add agenda items
 	for _, cid := range calendars {
@@ -90,10 +90,10 @@ func (dt *Daytimer) Agenda(date time.Time, calendars []string) (*Agenda, error) 
 
 		for _, event := range events.Items {
 			item := &AgendaItem{
-				calendar: dt.calendars[cid],
-				event:    event,
+				Calendar: dt.calendars[cid],
+				Event:    event,
 			}
-			agenda.items = append(agenda.items, item)
+			agenda.Items = append(agenda.Items, item)
 		}
 	}
 
@@ -121,7 +121,7 @@ func (dt *Daytimer) Upcoming(n int64, cid string) ([]*AgendaItem, error) {
 	// Set up query parameters
 	after := time.Now().Format(time.RFC3339)
 
-	query := dt.gcal.Events.List(cal.item.Id)
+	query := dt.gcal.Events.List(cal.Item.Id)
 	query = query.ShowDeleted(false).SingleEvents(true).OrderBy("startTime")
 	query = query.TimeMin(after).MaxResults(n)
 
@@ -135,8 +135,8 @@ func (dt *Daytimer) Upcoming(n int64, cid string) ([]*AgendaItem, error) {
 
 	for _, event := range events.Items {
 		item := &AgendaItem{
-			calendar: dt.calendars[cid],
-			event:    event,
+			Calendar: dt.calendars[cid],
+			Event:    event,
 		}
 		upcoming = append(upcoming, item)
 	}
@@ -160,14 +160,14 @@ func (dt *Daytimer) Calendars() (Calendars, error) {
 		// Create the calendars mapping
 		dt.calendars = make(map[string]*Calendar)
 		for _, cal := range cals.Items {
-			dt.calendars[cal.Id] = &Calendar{item: cal}
+			dt.calendars[cal.Id] = &Calendar{Item: cal}
 		}
 
 		// Mark calendars active from config otherwise set primary as the
 		// active calendar and dump the active calendars file.
 		if err := dt.calendars.loadActive(); err != nil {
 			for _, cal := range dt.calendars {
-				if cal.item.Primary {
+				if cal.Item.Primary {
 					cal.active = true
 				}
 			}

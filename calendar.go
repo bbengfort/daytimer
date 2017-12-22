@@ -18,7 +18,7 @@ type Calendars map[string]*Calendar
 // Calendar is a wrapper for a Google Calendar List Entry that provides extra
 // methods for use with the daytimer applciation.
 type Calendar struct {
-	item   *calendar.CalendarListEntry // The Google API Calendar Entry
+	Item   *calendar.CalendarListEntry // The Google API Calendar Entry
 	active bool                        // If the user has marked this calendar as active
 }
 
@@ -29,7 +29,7 @@ type Calendar struct {
 // Primary returns the calendar listed as primary or nil
 func (c Calendars) Primary() *Calendar {
 	for _, cal := range c {
-		if cal.item.Primary {
+		if cal.Item.Primary {
 			return cal
 		}
 	}
@@ -124,27 +124,27 @@ func (c Calendars) dumpActive() error {
 //===========================================================================
 
 func (c *Calendar) String() string {
-	if c.item == nil {
+	if c.Item == nil {
 		return ""
 	}
 
 	var title string
-	if c.item.SummaryOverride != "" {
-		title = c.item.SummaryOverride
-	} else if c.item.Summary != "" {
-		title = c.item.Summary
+	if c.Item.SummaryOverride != "" {
+		title = c.Item.SummaryOverride
+	} else if c.Item.Summary != "" {
+		title = c.Item.Summary
 	} else {
 		title = "Google Calendar"
 	}
 
 	var repr string
-	if c.item.Location != "" {
-		repr = fmt.Sprintf("%s (%s) in %s", title, c.item.Id, c.item.Location)
+	if c.Item.Location != "" {
+		repr = fmt.Sprintf("%s (%s) in %s", title, c.Item.Id, c.Item.Location)
 	} else {
-		repr = fmt.Sprintf("%s (%s)", title, c.item.Id)
+		repr = fmt.Sprintf("%s (%s)", title, c.Item.Id)
 	}
 
-	if c.item.Primary {
+	if c.Item.Primary {
 		repr = "☆ " + repr
 	}
 

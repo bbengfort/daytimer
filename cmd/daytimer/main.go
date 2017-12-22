@@ -34,7 +34,11 @@ func main() {
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "d, date",
-					Usage: "specify the date as YYYY/MM/DD (default today)",
+					Usage: "specify the date as YYYY-MM-DD (default today)",
+				},
+				cli.StringFlag{
+					Name:  "e, email",
+					Usage: "send the agenda to the specified email",
 				},
 			},
 		},
@@ -100,7 +104,7 @@ func initDaytimer(c *cli.Context) (err error) {
 func auth(c *cli.Context) error {
 	auth := new(daytimer.Authentication)
 	if err := auth.Authenticate(); err != nil {
-		return cli.NewExitError(err.Error(), 1)
+		return cli.NewExitError(err, 1)
 	}
 
 	return nil
@@ -108,16 +112,28 @@ func auth(c *cli.Context) error {
 
 // Computes the agenda for a given date
 func agenda(c *cli.Context) error {
+	// Get the date for the agenda
 	date, err := daytimer.ParseDate(c.String("date"))
 	if err != nil {
-		return cli.NewExitError(err.Error(), 1)
+		return cli.NewExitError(err, 1)
 	}
 
+	// Fetch the agenda from the daytimer
 	agenda, err := dt.Agenda(date, nil)
 	if err != nil {
-		return cli.NewExitError(err.Error(), 1)
+		return cli.NewExitError(err, 1)
 	}
 
+	// Send email if requested
+	if sendto := c.String("email"); sendto != "" {
+		if err := agenda.Send(sendto); err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		fmt.Printf("agenda sent to %s\n", sendto)
+		return nil
+	}
+
+	// Print agenda if not emailed
 	fmt.Println(agenda.String())
 	return nil
 }
@@ -127,7 +143,7 @@ func upcoming(c *cli.Context) error {
 
 	events, err := dt.Upcoming(c.Int64("number"), c.String("calendar"))
 	if err != nil {
-		return cli.NewExitError(err.Error(), 1)
+		return cli.NewExitError(err, 1)
 	}
 
 	if len(events) > 0 {
@@ -146,7 +162,7 @@ func upcoming(c *cli.Context) error {
 func calendars(c *cli.Context) error {
 	cals, err := dt.Calendars()
 	if err != nil {
-		return cli.NewExitError(err.Error(), 1)
+		return cli.NewExitError(err, 1)
 	}
 
 	// List all availabe calendars and return

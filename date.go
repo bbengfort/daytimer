@@ -4,7 +4,7 @@ import "time"
 
 // Layouts for various date and time serialization
 const (
-	DateLayout = "2006/01/02"
+	DateLayout = "2006-01-02"
 )
 
 // ParseDate converts a datestamp in the form of YYYY/MM/DD into a date. If
