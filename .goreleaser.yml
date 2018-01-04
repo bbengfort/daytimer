@@ -19,7 +19,3 @@ archive:
       amd64: 64-bit
       darwin: macOS
       linux: ubuntu
-    files:
-      - LICENSE
-      - README.md
-      - templates/*

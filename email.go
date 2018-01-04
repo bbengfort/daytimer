@@ -8,7 +8,6 @@ import (
 	"net/smtp"
 	"path/filepath"
 	"strings"
-	"text/template"
 )
 
 //===========================================================================
@@ -27,7 +26,7 @@ func (a *Agenda) Send(to string) error {
 
 	// Create Agenda HTML message
 	buffer := new(bytes.Buffer)
-	template := template.Must(template.ParseFiles("templates/agenda.html"))
+	template := MustLoadTemplate("templates/agenda.html")
 	if err := template.Execute(buffer, &a); err != nil {
 		return err
 	}
@@ -66,7 +65,7 @@ func (e *Email) Send(to []string) error {
 
 	// Generate email template
 	buffer := new(bytes.Buffer)
-	template := template.Must(template.ParseFiles("templates/email.txt"))
+	template := MustLoadTemplate("templates/email.txt")
 	if err := template.Execute(buffer, &e); err != nil {
 		return err
 	}
