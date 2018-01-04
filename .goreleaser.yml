@@ -1,0 +1,25 @@
+# GoReleaser
+project_name: daytimer
+
+# Build Customization
+builds:
+    -
+      main: ./cmd/daytimer/main.go
+      binary: daytimer
+      goos:
+        - darwin
+        - linux
+      goarch:
+        - amd64
+
+# Archive Customization
+archive:
+    format: tar.gz
+    replacements:
+      amd64: 64-bit
+      darwin: macOS
+      linux: ubuntu
+    files:
+      - LICENSE
+      - README.md
+      - templates/*
