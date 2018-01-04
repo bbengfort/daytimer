@@ -53,7 +53,8 @@ type Daytimer struct {
 	auth      *Authentication   // OAuth2 Authentication
 	client    *http.Client      // HTTP client for API interaction
 	gcal      *calendar.Service // Google Calendar Service RPCs
-	calendars Calendars         // The calendards beling to the user
+	calendars Calendars         // The calendars belonging to the user
+	timezone  *time.Location    // The timezone being used for requests
 }
 
 // Agenda returns a listing of the events for a specific day and a specific
@@ -67,6 +68,9 @@ func (dt *Daytimer) Agenda(date time.Time, calendars []string) (*Agenda, error) 
 		return nil, err
 	}
 
+	// Set the timezone of the date (may be UTC, hopefully a calendar's TZ)
+	date = Localize(date, dt.Timezone())
+
 	// Create time range
 	after, before := DayRange(date)
 
@@ -74,6 +78,8 @@ func (dt *Daytimer) Agenda(date time.Time, calendars []string) (*Agenda, error) 
 	agenda := new(Agenda)
 	agenda.Title = fmt.Sprintf("Daily Agenda for %s", date.Format("Monday, January 2, 2006"))
 	agenda.Items = make([]*AgendaItem, 0)
+	agenda.Daytimer = dt
+	agenda.Counts = make(map[string]int)
 
 	// For each calendar, add agenda items
 	for _, cid := range calendars {
@@ -95,6 +101,8 @@ func (dt *Daytimer) Agenda(date time.Time, calendars []string) (*Agenda, error) 
 			}
 			agenda.Items = append(agenda.Items, item)
 		}
+
+		agenda.Counts[cid] = len(events.Items)
 	}
 
 	// Sort the agenda items
@@ -179,6 +187,31 @@ func (dt *Daytimer) Calendars() (Calendars, error) {
 	}
 
 	return dt.calendars, nil
+}
+
+// Timezone returns the timezone set on the daytimer, if one is not specified
+// it searches the calendars for a timezone, then defaults to UTC.
+func (dt *Daytimer) Timezone() *time.Location {
+
+	if dt.timezone == nil {
+		// Search for the first calendar with a timezone
+		for _, cal := range dt.calendars {
+			if cal.Item.TimeZone != "" {
+				loc, err := time.LoadLocation(cal.Item.TimeZone)
+				if err == nil {
+					dt.timezone = loc
+					break
+				}
+			}
+		}
+
+		// If it's still nil, then default to UTC
+		if dt.timezone == nil {
+			dt.timezone, _ = time.LoadLocation("UTC")
+		}
+	}
+
+	return dt.timezone
 }
 
 // returns valid calendars from the list of calendar id strings. If no

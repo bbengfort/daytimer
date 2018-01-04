@@ -53,7 +53,7 @@ type Email struct {
 // NewEmail creates a new email message
 func NewEmail(subject string, body string, config *SMTPConfig) *Email {
 	return &Email{
-		From:    config.User,
+		From:    "Daytimer Agenda",
 		Subject: subject,
 		Body:    body,
 		config:  config,
@@ -74,7 +74,7 @@ func (e *Email) Send(to []string) error {
 	err := smtp.SendMail(
 		e.config.Addr(),
 		e.config.Auth(),
-		e.From, to,
+		e.config.User, to,
 		buffer.Bytes(),
 	)
 

@@ -15,8 +15,10 @@ import (
 
 // Agenda is a wrapper for a list of events.
 type Agenda struct {
-	Title string
-	Items []*AgendaItem
+	Title    string
+	Items    []*AgendaItem
+	Counts   map[string]int // list of calendars and # of items per each
+	Daytimer *Daytimer
 }
 
 // AgendaItem holds an event or printable item for an agenda.
@@ -25,6 +27,7 @@ type AgendaItem struct {
 	Calendar  *Calendar
 	Event     *calendar.Event
 	startTime time.Time
+	endTime   time.Time
 }
 
 //===========================================================================
@@ -57,6 +60,11 @@ func (a *Agenda) String() string {
 	return strings.Join(items, "\n")
 }
 
+// Count returns the number of items on the agenda
+func (a *Agenda) Count() int {
+	return len(a.Items)
+}
+
 //===========================================================================
 // AgendaItem Methods
 //===========================================================================
@@ -87,4 +95,48 @@ func (a *AgendaItem) StartTime() time.Time {
 	}
 
 	return a.startTime
+}
+
+// EndTime returns the computed end time from teh event
+func (a *AgendaItem) EndTime() time.Time {
+	var err error
+
+	if a.endTime.IsZero() && !a.Event.EndTimeUnspecified {
+		if a.Event.End.DateTime != "" {
+			a.endTime, err = time.Parse(time.RFC3339, a.Event.End.DateTime)
+		} else {
+			a.endTime, err = time.Parse("2006-01-02", a.Event.End.Date)
+		}
+	}
+
+	if err != nil {
+		panic(err)
+	}
+
+	return a.endTime
+}
+
+// Color returns the calendar color
+func (a *AgendaItem) Color(layer string) string {
+	switch layer {
+	case "bg":
+		return a.Calendar.Item.BackgroundColor
+	case "fg":
+		return a.Calendar.Item.ForegroundColor
+	default:
+		return ""
+	}
+}
+
+// Period returns a string representation of the time period of the event.
+func (a *AgendaItem) Period() string {
+	if a.Event.Start.DateTime == "" {
+		return "All Day"
+	}
+
+	if !a.EndTime().IsZero() && a.EndTime().After(a.StartTime()) {
+		return fmt.Sprintf("%s – %s", a.StartTime().Format("15:04"), a.EndTime().Format("15:04"))
+	}
+
+	return a.StartTime().Format("15:04")
 }

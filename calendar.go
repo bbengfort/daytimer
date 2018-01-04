@@ -128,14 +128,7 @@ func (c *Calendar) String() string {
 		return ""
 	}
 
-	var title string
-	if c.Item.SummaryOverride != "" {
-		title = c.Item.SummaryOverride
-	} else if c.Item.Summary != "" {
-		title = c.Item.Summary
-	} else {
-		title = "Google Calendar"
-	}
+	title := c.Summary()
 
 	var repr string
 	if c.Item.Location != "" {
@@ -149,4 +142,19 @@ func (c *Calendar) String() string {
 	}
 
 	return repr
+}
+
+// Summary returns the summary of the calendar
+func (c *Calendar) Summary() string {
+	if c.Item == nil {
+		return ""
+	}
+
+	if c.Item.SummaryOverride != "" {
+		return c.Item.SummaryOverride
+	} else if c.Item.Summary != "" {
+		return c.Item.Summary
+	}
+
+	return "Google Calendar"
 }
