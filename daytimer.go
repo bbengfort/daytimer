@@ -13,6 +13,9 @@ import (
 	calendar "google.golang.org/api/calendar/v3"
 )
 
+// Version is the current release of daytimer
+const Version = "0.1"
+
 // New creates a daytimer and initialize the internal state.
 func New() (*Daytimer, error) {
 	var err error

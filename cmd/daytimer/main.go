@@ -17,7 +17,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "daytimer"
 	app.Usage = "interact with your Google calendar from the command line"
-	app.Version = "0.1"
+	app.Version = daytimer.Version
 
 	// Define commands available to the application
 	app.Commands = []cli.Command{

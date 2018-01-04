@@ -65,6 +65,11 @@ func (a *Agenda) Count() int {
 	return len(a.Items)
 }
 
+// Version returns the daytimer version so that the template is updated.
+func (a *Agenda) Version() string {
+	return Version
+}
+
 //===========================================================================
 // AgendaItem Methods
 //===========================================================================
