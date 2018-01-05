@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"strings"
 )
 
 // Returns the path to the configuration directory.
@@ -24,7 +25,7 @@ func configDirectory() (string, error) {
 }
 
 // Returns an iterator that returns one line of a file at a time.
-func readLines(path string) (<-chan string, error) {
+func readLines(path string, skip bool) (<-chan string, error) {
 	fobj, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -41,7 +42,11 @@ func readLines(path string) (<-chan string, error) {
 		defer close(chnl)
 
 		for scanner.Scan() {
-			chnl <- scanner.Text()
+			line := scanner.Text()
+			if skip && strings.HasPrefix(line, "#") {
+				continue
+			}
+			chnl <- line
 		}
 	}()
 
@@ -61,4 +66,17 @@ func writeLines(lines []string, path string) error {
 		fmt.Fprintln(w, line)
 	}
 	return w.Flush()
+}
+
+// path exists returns true if a file is at the specified location, note that
+// this will return true if there is a permissions error even if the file
+// does not exist.
+func pathExists(path string) (bool, error) {
+	if _, err := os.Stat(path); err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }

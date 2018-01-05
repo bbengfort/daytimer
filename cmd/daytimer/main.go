@@ -74,6 +74,21 @@ func main() {
 					Name:  "a, activate",
 					Usage: "activate specfied calendars (comma sep)",
 				},
+				cli.BoolFlag{
+					Name:  "e, edit",
+					Usage: "edit the calendar list directly",
+				},
+			},
+		},
+		{
+			Name:   "config",
+			Usage:  "update the daytimer configuration",
+			Action: config,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "e, edit",
+					Usage: "edit the configuration directly",
+				},
 			},
 		},
 	}
@@ -171,6 +186,14 @@ func calendars(c *cli.Context) error {
 		return nil
 	}
 
+	// Edit the calendar list and return
+	if c.Bool("edit") {
+		if err := cals.Edit(); err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		return nil
+	}
+
 	// Set calendars as active in config
 	if activate := c.String("activate"); activate != "" {
 		for _, cid := range strings.Split(activate, ",") {
@@ -183,5 +206,23 @@ func calendars(c *cli.Context) error {
 
 	// Filter active calendars and print
 	fmt.Println(cals.Active().String())
+	return nil
+}
+
+// Runs the configuration script.
+func config(c *cli.Context) error {
+	conf, err := daytimer.LoadConfig()
+	if err != nil {
+		return cli.NewExitError(err, 1)
+	}
+
+	if c.Bool("edit") {
+		if err := conf.Edit(); err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		return nil
+	}
+
+	fmt.Println(conf)
 	return nil
 }

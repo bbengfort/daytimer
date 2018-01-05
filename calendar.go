@@ -69,6 +69,20 @@ func (c Calendars) String() string {
 	return strings.Join(reprs, "\n")
 }
 
+// Edit the calendars file.
+func (c Calendars) Edit() error {
+	path, err := c.configPath()
+	if err != nil {
+		return err
+	}
+
+	if err := EditFile(path); err != nil {
+		return fmt.Errorf("%s: please edit %s directly", err, path)
+	}
+
+	return nil
+}
+
 // Get the path to the active calendars config
 func (c Calendars) configPath() (string, error) {
 	confDir, err := configDirectory()
@@ -86,7 +100,7 @@ func (c Calendars) loadActive() error {
 		return err
 	}
 
-	reader, err := readLines(path)
+	reader, err := readLines(path, true)
 	if err != nil {
 		return err
 	}

@@ -1,0 +1,14 @@
+# Daytimer Configuration File
+
+# Set the full path to the default text editor you'd like to use.
+# You can also set $EDITOR in the environment. Otherwise will try to find a
+# default editor to use.
+editor: ""
+
+# Add the SMTP configuration to send email agendas
+email:
+  host: "smtp.gmail.com"
+  port: 587
+  user: ""
+  password: ""
+  use_tls: true

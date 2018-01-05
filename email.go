@@ -2,11 +2,8 @@ package daytimer
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/smtp"
-	"path/filepath"
 	"strings"
 )
 
@@ -19,8 +16,8 @@ import (
 func (a *Agenda) Send(to string) error {
 
 	// Load email configuration
-	config := new(SMTPConfig)
-	if err := config.Load(); err != nil {
+	config, err := LoadConfig()
+	if err != nil {
 		return err
 	}
 
@@ -32,7 +29,7 @@ func (a *Agenda) Send(to string) error {
 	}
 
 	// Create new email to send
-	email := NewEmail(a.Title, buffer.String(), config)
+	email := NewEmail(a.Title, buffer.String(), config.Email)
 	return email.Send([]string{to})
 }
 
@@ -104,29 +101,4 @@ func (c *SMTPConfig) Addr() string {
 		return fmt.Sprintf("%s:%d", c.Host, c.Port)
 	}
 	return c.Host
-}
-
-// Load the configuration file from the internal path.
-func (c *SMTPConfig) Load() error {
-	path, err := c.configPath()
-	if err != nil {
-		return err
-	}
-
-	data, err := ioutil.ReadFile(path)
-	if err != nil {
-		return err
-	}
-
-	return json.Unmarshal(data, c)
-}
-
-// Get the path to the active calendars config
-func (c *SMTPConfig) configPath() (string, error) {
-	confDir, err := configDirectory()
-	if err != nil {
-		return "", err
-	}
-
-	return filepath.Join(confDir, "email.json"), nil
 }

@@ -14,7 +14,7 @@ import (
 )
 
 // Version is the current release of daytimer
-const Version = "0.1"
+const Version = "0.2"
 
 // New creates a daytimer and initialize the internal state.
 func New() (*Daytimer, error) {
