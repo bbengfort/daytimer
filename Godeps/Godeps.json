@@ -12,6 +12,11 @@
 			"Rev": "01b9e8cbca61bf2c704946d6f1790ec412519180"
 		},
 		{
+			"ImportPath": "github.com/ghodss/yaml",
+			"Comment": "v1.0.0",
+			"Rev": "0ca9ea5df5451ffdf184b4428c902747c2c11cd7"
+		},
+		{
 			"ImportPath": "github.com/urfave/cli",
 			"Comment": "v1.19.1",
 			"Rev": "0bdeddeeb0f650497d603c4ad7b20cfe685682f6"
@@ -59,6 +64,10 @@
 		{
 			"ImportPath": "google.golang.org/api/googleapi/internal/uritemplates",
 			"Rev": "0b0f5a5147930d092abd132cf09fafa23e8c3942"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v2",
+			"Rev": "a5b47d31c556af34a302ce5d659e6fea44d90de0"
 		}
 	]
 }

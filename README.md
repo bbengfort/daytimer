@@ -43,7 +43,7 @@ Where `calid` is a calendar id, which looks like an email address (and usually i
 
     $ daytimer calendars
 
-Your primary calendar will be marked with a ☆! If you prefer, you can also add each calendar id on its own line in `~/.daytimer/calendars.txt`. Now the agenda command will list all events for all active calendars.
+Your primary calendar will be marked with a ☆! If you prefer, you can also add each calendar id on its own line in `~/.daytimer/calendars.txt` or by running `daytimer calendars -e` (more on this in the configuration section). Now the agenda command will list all events for all active calendars.
 
 If you want to see the next 10 upcoming events for a specific calendar (your primary calendar by default) you do the following:
 
@@ -51,20 +51,36 @@ If you want to see the next 10 upcoming events for a specific calendar (your pri
 
 This will list the next `-n N` (default 10) events on that calendar, no matter how far in the future they will occur.
 
+### Configuration
+
+There are a variety of ways to edit configuration, but all config files are stored in `~/.daytimer/` (note that this means you must run daytimer as a user with a home directory). As a helper, some commands have a `-e` flag to directly edit their configurations. For example:
+
+    $ daytimer config -e
+
+Will open the configuration YAML file for editing. Note that this is fraught with peril, if you make a mistake or save bad YAML, then things won't work the next time and you'll have to edit the config manually!
+
+By default the editor that's chosen is searched for in the path or fetched via the `$EDITOR` environment variable. Additionally you can specify an editor in the config file itself.
+
+You can also edit the calendars list using:
+
+    $ daytimer calendars -e
+
+Write each calendar id (the associated email address) on its own line. Lines that start with `#` are ignored.
+
 ### Email
 
 If you would like to email your agenda to someone, you'll first need to setup SMTP. If you're using Gmail or Google Apps, make sure that you set your email account [to allow less secure apps](https://support.google.com/accounts/answer/6010255?hl=en).
 
-Create an email configuration JSON file in `~/.daytimer/email.json`:
+Edit the configuration file with `daytimer config -e` or edit `~/daytimer/config.json` with your email credentials:
 
-```json
-{
-    "use_tls": true,
-    "host": "smtp.gmail.com",
-    "port": 587,
-    "user": "me@gmail.com",
-    "password": "supersecretsquirrel"
-}
+```yaml
+# Add the SMTP configuration to send email agendas
+email:
+  host: "smtp.gmail.com",
+  port: 587,
+  user: "me@gmail.com",
+  password: "supersecretsquirrel"
+  use_tls: true
 ```
 
 This will (hopefully) be all that's needed to send yourself an HTML email with the agenda printed out:
