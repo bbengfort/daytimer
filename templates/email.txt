@@ -2,7 +2,7 @@ From: {{.From}}
 To: {{.To}}
 Subject: {{.Subject}}
 MIME-version: 1.0
-Content-Type: text/html; charset=&quot;UTF-8&quot;
+Content-Type: text/html;charset=utf-8
 
 
 {{.Body}}

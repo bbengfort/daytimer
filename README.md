@@ -69,13 +69,14 @@ Write each calendar id (the associated email address) on its own line. Lines tha
 
 ### Email
 
-If you would like to email your agenda to someone, you'll first need to setup SMTP. If you're using Gmail or Google Apps, make sure that you set your email account [to allow less secure apps](https://support.google.com/accounts/answer/6010255?hl=en).
+If you would like to email your agenda to someone, you'll first need to setup SMTP. If you're using Gmail or Google Apps, make sure that you set your email account [to allow less secure apps](https://support.google.com/accounts/answer/6010255?hl=en). You can also use Amazon SES or other services with SMTP authentication to send mail. 
 
 Edit the configuration file with `daytimer config -e` or edit `~/daytimer/config.yml` with your email credentials:
 
 ```yaml
 # Add the SMTP configuration to send email agendas
 email:
+  from: "me@gmail.com"
   host: "smtp.gmail.com",
   port: 587,
   user: "me@gmail.com",

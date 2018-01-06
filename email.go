@@ -49,7 +49,7 @@ type Email struct {
 // NewEmail creates a new email message
 func NewEmail(subject string, body string, config *SMTPConfig) *Email {
 	return &Email{
-		From:    "Daytimer Agenda",
+		From:    fmt.Sprintf("Daytimer Agenda <%s>", config.From),
 		Subject: subject,
 		Body:    body,
 		config:  config,
@@ -70,7 +70,7 @@ func (e *Email) Send(to []string) error {
 	err := smtp.SendMail(
 		e.config.Addr(),
 		e.config.Auth(),
-		e.config.User, to,
+		e.config.From, to,
 		buffer.Bytes(),
 	)
 
@@ -83,11 +83,12 @@ func (e *Email) Send(to []string) error {
 
 // SMTPConfig loads the email configuration from JSON.
 type SMTPConfig struct {
-	UseTLS   bool   `json:"use_tls"`
-	Host     string `json:"host"`
-	Port     int    `json:"port"`
-	User     string `json:"user"`
-	Password string `json:"password"`
+	Host     string `json:"host"`     // SMTP Hostname
+	Port     int    `json:"port"`     // SMTP Port usually 25, 465, or 587
+	User     string `json:"user"`     // Username for SMTP authentication
+	From     string `json:"from"`     // From email address (must be valid)
+	Password string `json:"password"` // Password for SMTP authentication
+	UseTLS   bool   `json:"use_tls"`  // Use TLS for secure email
 }
 
 // Auth creates an SMTP authentication struct

@@ -5,8 +5,11 @@
 # default editor to use.
 editor: ""
 
-# Add the SMTP configuration to send email agendas
+# Add the SMTP configuration to send email agendas (e.g. Amazon SES or
+# Google Mail). Note that from must be a valid email address and will be
+# used as the sender of the email with the name "Daytimer Agenda".
 email:
+  from: ""
   host: "smtp.gmail.com"
   port: 587
   user: ""
