@@ -71,7 +71,7 @@ Write each calendar id (the associated email address) on its own line. Lines tha
 
 If you would like to email your agenda to someone, you'll first need to setup SMTP. If you're using Gmail or Google Apps, make sure that you set your email account [to allow less secure apps](https://support.google.com/accounts/answer/6010255?hl=en).
 
-Edit the configuration file with `daytimer config -e` or edit `~/daytimer/config.json` with your email credentials:
+Edit the configuration file with `daytimer config -e` or edit `~/daytimer/config.yml` with your email credentials:
 
 ```yaml
 # Add the SMTP configuration to send email agendas

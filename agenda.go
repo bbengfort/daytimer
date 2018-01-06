@@ -1,7 +1,9 @@
 package daytimer
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"sort"
 	"strings"
 	"time"
@@ -68,6 +70,19 @@ func (a *Agenda) Count() int {
 // Version returns the daytimer version so that the template is updated.
 func (a *Agenda) Version() string {
 	return Version
+}
+
+// WriteHTML writes the HTML data to the specified path.
+func (a *Agenda) WriteHTML(path string) error {
+	// Create Agenda HTML message
+	buffer := new(bytes.Buffer)
+	template := MustLoadTemplate("templates/agenda.html")
+	if err := template.Execute(buffer, &a); err != nil {
+		return err
+	}
+
+	// Write the buffer to disk
+	return ioutil.WriteFile(path, buffer.Bytes(), 0644)
 }
 
 //===========================================================================

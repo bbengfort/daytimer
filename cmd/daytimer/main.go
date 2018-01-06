@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -39,6 +40,10 @@ func main() {
 				cli.StringFlag{
 					Name:  "e, email",
 					Usage: "send the agenda to the specified email",
+				},
+				cli.StringFlag{
+					Name:  "o, html",
+					Usage: "write the agenda html to the specified path",
 				},
 			},
 		},
@@ -144,7 +149,16 @@ func agenda(c *cli.Context) error {
 		if err := agenda.Send(sendto); err != nil {
 			return cli.NewExitError(err, 1)
 		}
-		fmt.Printf("agenda sent to %s\n", sendto)
+		log.Printf("agenda sent to %s\n", sendto)
+		return nil
+	}
+
+	// Write HTML if requested
+	if tohtml := c.String("html"); tohtml != "" {
+		if err := agenda.WriteHTML(tohtml); err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		log.Printf("agenda HTML written to %s\n", tohtml)
 		return nil
 	}
 
